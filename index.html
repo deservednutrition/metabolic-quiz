@@ -1,705 +1,459 @@
 <!DOCTYPE html>
-<html lang="zh-TW" class="dark">
+<html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>90秒代謝型態診斷 | 找出你的專屬營養解法</title>
-    
-    <!-- Tailwind CSS CDN -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>90秒代謝型態與身心脈絡檢測</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Noto Serif TC & Noto Sans TC for healing aesthetic -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Noto+Serif+TC:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        brand: {
-                            50: '#f0fdf4',
-                            100: '#dcfce7',
-                            400: '#4ade80',
-                            500: '#22c55e',
-                            600: '#16a34a',
-                            900: '#14532d',
+                        cream: {
+                            50: '#FDFBF7',
+                            100: '#FBF9F5', // Main bg
+                            200: '#F5EFE6', // Light beige
+                            300: '#E8DEC9',
+                            400: '#D2C2A5',
                         },
-                        accent: {
-                            400: '#38bdf8',
-                            500: '#06b6d4',
-                            600: '#0284c7',
+                        earth: {
+                            500: '#C86D51', // Accent Warm Terracotta
+                            600: '#B0593F',
+                            700: '#8C432F',
                         },
-                        darkbg: '#0f172a',
-                        cardbg: '#1e293b'
+                        sage: {
+                            500: '#5B8266', // Healing Sage Green
+                            600: '#466850',
+                        },
+                        charcoal: {
+                            800: '#3A3027', // Deep warm text
+                            900: '#231D18',
+                        }
                     },
                     fontFamily: {
-                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans TC"', 'sans-serif'],
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 4s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-6px)' },
-                        }
+                        sans: ['"Noto Sans TC"', 'sans-serif'],
+                        serif: ['"Noto Serif TC"', 'serif'],
                     }
                 }
             }
         }
     </script>
-
-    <!-- Canvas Confetti for Result Screen -->
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
     <style>
-        /* Smooth scrolling and tap highlights */
-        html {
-            -webkit-tap-highlight-color: transparent;
-            scroll-behavior: smooth;
+        body {
+            background-color: #FBF9F5;
+            color: #3A3027;
+            font-family: 'Noto Sans TC', sans-serif;
+            background-image: radial-gradient(#E8DEC9 0.75px, transparent 0.75px);
+            background-size: 24px 24px;
         }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        .card-shadow {
+            box-shadow: 0 10px 30px -5px rgba(58, 48, 39, 0.05), 0 4px 12px -2px rgba(58, 48, 39, 0.03);
         }
-        ::-webkit-scrollbar-track {
-            background: #0f172a;
+        .transition-all-custom {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 9999px;
-        }
-
-        /* Glassmorphic card styling */
-        .glass-card {
-            background: rgba(30, 41, 59, 0.75);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .glass-card-active {
-            background: rgba(30, 41, 59, 0.95);
-            border-color: rgba(74, 222, 128, 0.5);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.15);
-        }
-
-        /* Option selection pulse */
-        .option-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .option-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* Fade slide animation classes */
-        .page-transition-enter {
-            opacity: 0;
-            transform: translateY(12px);
-        }
-        .page-transition-active {
-            opacity: 1;
-            transform: translateY(0);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+        .serif-title {
+            font-family: 'Noto Serif TC', serif;
         }
     </style>
 </head>
-<body class="bg-slate-950 text-slate-100 font-sans min-h-screen flex flex-col justify-between antialiased selection:bg-brand-500 selection:text-white">
+<body class="min-h-screen flex flex-col justify-between items-center p-4 md:p-6">
 
-    <!-- Meta Pixel & GA4 Placeholder Script -->
-    <script>
-        // Track Pixel & Analytics events helper
-        function trackAnalyticsEvent(eventName, params = {}) {
-            console.log(`[Analytics Event Tracked]: ${eventName}`, params);
-            
-            // Meta Pixel Trigger (Uncomment when Meta Pixel is added)
-            /*
-            if (typeof fbq === 'function') {
-                fbq('trackCustom', eventName, params);
-            }
-            */
-
-            // Google Analytics 4 Trigger (Uncomment when GA4 is added)
-            /*
-            if (typeof gtag === 'function') {
-                gtag('event', eventName, params);
-            }
-            */
-        }
-    </script>
-
-    <!-- Top Navigation Header -->
-    <header class="sticky top-0 z-50 bg-slate-950/80 backdrop-blur-md border-b border-slate-800/80 px-4 py-3">
-        <div class="max-w-md mx-auto flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-500 to-accent-400 flex items-center justify-center font-bold text-slate-950 text-sm shadow-md shadow-brand-500/20">
-                    90s
-                </div>
-                <div>
-                    <h1 class="text-xs font-semibold text-slate-400 tracking-wider uppercase">Metabolic Assessment</h1>
-                    <p class="text-sm font-bold text-slate-100">90秒代謝型態診斷</p>
-                </div>
-            </div>
-            <div id="header-badge" class="hidden text-xs bg-slate-800 text-brand-400 border border-brand-500/30 px-2.5 py-1 rounded-full font-medium">
-                已完成 <span id="progress-text">0/5</span>
-            </div>
+    <!-- Header Navigation -->
+    <header class="w-full max-w-md mx-auto flex justify-between items-center py-3 px-2 mb-2">
+        <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-earth-500 animate-pulse"></span>
+            <span class="text-xs font-medium tracking-wider text-charcoal-800 opacity-75">身心狀態與代謝檢測</span>
         </div>
-        
-        <!-- Progress Bar (Hidden on Start/Result) -->
-        <div id="progress-bar-container" class="max-w-md mx-auto mt-2 h-1.5 bg-slate-800 rounded-full overflow-hidden hidden">
-            <div id="progress-bar" class="h-full bg-gradient-to-r from-brand-500 to-accent-400 transition-all duration-300 w-0"></div>
-        </div>
+        <span class="text-xs text-charcoal-800 opacity-50">90 秒深度閱讀</span>
     </header>
 
     <!-- Main Container -->
-    <main class="flex-grow flex items-center justify-center px-4 py-6">
-        <div class="w-full max-w-md mx-auto">
-
-            <!-- 1. LANDING PAGE / START SCREEN -->
-            <section id="start-screen" class="space-y-6 page-transition-active">
-                <div class="text-center space-y-3">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-brand-500/10 text-brand-400 border border-brand-500/20 animate-pulse-slow">
-                        <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20"><path d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.57l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.57l7-10a1 1 0 011.12-.384z"/></svg>
-                        IG 廣受好評！已有 12,400+ 人完成測驗
-                    </span>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight leading-snug">
-                        為什麼少吃多動<br><span class="bg-gradient-to-r from-brand-400 via-accent-400 to-brand-500 bg-clip-text text-transparent">體態依然卡關？</span>
-                    </h2>
-                    <p class="text-sm text-slate-400 leading-relaxed px-2">
-                        盲目補充保健品往往收效甚微。透過 90 秒臨床衛教邏輯分析，快速推導你的「代謝阻滯點」與「營養素缺口」。
-                    </p>
+    <main class="w-full max-w-md mx-auto my-auto">
+        
+        <!-- STEP 0: Welcome Screen -->
+        <div id="step-intro" class="bg-[#FFFDF9] rounded-3xl p-6 md:p-8 card-shadow border border-cream-200 transition-all-custom text-center">
+            <div class="w-16 h-16 bg-cream-200 rounded-full flex items-center justify-center mx-auto mb-5 text-earth-500 text-2xl">
+                <i class="fa-solid fa-leaf"></i>
+            </div>
+            <h1 class="text-2xl font-bold text-charcoal-800 serif-title mb-3 leading-snug">
+                傾聽身體的聲音<br>找到你的專屬代謝節奏
+            </h1>
+            <p class="text-sm text-charcoal-800 opacity-80 leading-relaxed mb-6 font-light">
+                你是否經常感到疲倦、消化沉重，或是體態卡關？透過 5 個生活脈絡觀察，釐清內在代謝與亞健康阻滯點。
+            </p>
+            <div class="bg-cream-100 p-4 rounded-2xl text-xs text-charcoal-800 opacity-80 mb-6 flex items-start gap-3 text-left">
+                <i class="fa-regular fa-circle-check text-sage-500 text-base mt-0.5"></i>
+                <div>
+                    <span class="font-semibold block mb-0.5">溫馨提醒</span>
+                    本檢測基於日常飲食與生理反應推導，幫助你重新建立健康的個人化調理方向。
                 </div>
-
-                <!-- Feature Highlights -->
-                <div class="glass-card rounded-2xl p-5 space-y-4">
-                    <div class="flex items-start space-x-3.5">
-                        <div class="p-2 bg-brand-500/10 text-brand-400 rounded-xl mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-200">5 題精準分析</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">涵蓋餐後體感、脂肪囤積部位、睡眠與循環機能。</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-3.5">
-                        <div class="p-2 bg-accent-500/10 text-accent-400 rounded-xl mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-200">客製化營養學報告</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">剖析皮質醇、血糖震盪與腸道微生態對代謝的影響。</p>
-                        </div>
-                    </div>
-
-                    <div class="flex items-start space-x-3.5">
-                        <div class="p-2 bg-purple-500/10 text-purple-400 rounded-xl mt-0.5">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-slate-200">100% 獨立解法推導</h3>
-                            <p class="text-xs text-slate-400 mt-0.5">拒絕無效濫補，提供精準關鍵配方建議。</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Action Button -->
-                <button onclick="startQuiz()" class="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-brand-500 to-accent-500 text-slate-950 font-extrabold text-base tracking-wide shadow-lg shadow-brand-500/25 hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center space-x-2">
-                    <span>開始 90 秒診斷</span>
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                </button>
-            </section>
-
-            <!-- 2. QUESTION SCREEN -->
-            <section id="question-screen" class="hidden space-y-5">
-                <!-- Question Header -->
-                <div class="space-y-1">
-                    <span id="question-category" class="text-xs font-bold text-brand-400 uppercase tracking-widest">
-                        類別標籤
-                    </span>
-                    <h3 id="question-title" class="text-xl font-extrabold text-white leading-snug">
-                        題目內容載入中...
-                    </h3>
-                </div>
-
-                <!-- Options Grid -->
-                <div id="options-container" class="space-y-3">
-                    <!-- Options injected via JavaScript -->
-                </div>
-
-                <!-- Navigation Controls -->
-                <div class="flex items-center justify-between pt-2">
-                    <button id="prev-btn" onclick="prevQuestion()" class="hidden text-xs text-slate-400 hover:text-slate-200 flex items-center space-x-1 py-2 px-3 rounded-lg border border-slate-800 bg-slate-900/50">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        <span>上一題</span>
-                    </button>
-                    <span class="text-xs text-slate-500 italic ml-auto">點擊選項自動進入下一題</span>
-                </div>
-            </section>
-
-            <!-- 3. LOADING / CALCULATING SCREEN -->
-            <section id="loading-screen" class="hidden text-center py-12 space-y-6">
-                <div class="relative w-20 h-20 mx-auto">
-                    <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
-                    <div class="absolute inset-0 rounded-full border-4 border-brand-500 border-t-transparent animate-spin"></div>
-                    <div class="absolute inset-0 flex items-center justify-center font-bold text-xs text-brand-400">
-                        AI 分析
-                    </div>
-                </div>
-                <div class="space-y-2">
-                    <h3 class="text-lg font-bold text-white">正在交叉比對代謝指標...</h3>
-                    <p id="loading-subtext" class="text-xs text-slate-400 animate-pulse">解析胰島素敏感度、皮質醇與腸道發酵數據...</p>
-                </div>
-            </section>
-
-            <!-- 4. RESULT SCREEN -->
-            <section id="result-screen" class="hidden space-y-6">
-                
-                <!-- Result Header Card -->
-                <div class="glass-card rounded-2xl p-6 text-center space-y-4 border-brand-500/30 relative overflow-hidden">
-                    <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-500/10 rounded-full blur-2xl"></div>
-                    
-                    <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-brand-500/20 text-brand-400 border border-brand-500/30">
-                        測驗分析完成
-                    </span>
-
-                    <div class="space-y-1">
-                        <p class="text-xs text-slate-400">你的主要代謝型態為</p>
-                        <h2 id="result-type-title" class="text-2xl font-black text-white bg-gradient-to-r from-brand-400 to-accent-400 bg-clip-text text-transparent">
-                            【代謝型態名稱】
-                        </h2>
-                    </div>
-
-                    <!-- Match Percentage Meter -->
-                    <div class="bg-slate-900/80 rounded-xl p-3 border border-slate-800 flex items-center justify-around">
-                        <div class="text-left">
-                            <span class="text-xs text-slate-400 block">特徵符合度</span>
-                            <span id="result-match-rate" class="text-2xl font-black text-brand-400">92%</span>
-                        </div>
-                        <div class="h-8 w-px bg-slate-800"></div>
-                        <div class="text-left">
-                            <span class="text-xs text-slate-400 block">潛在阻滯層級</span>
-                            <span id="result-risk-level" class="text-xs font-bold text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">中高度風險</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Deep Scientific Analysis -->
-                <div class="glass-card rounded-2xl p-5 space-y-3">
-                    <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-                        <svg class="w-4 h-4 text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                        深度營養學機制剖析
-                    </h3>
-                    <p id="result-analysis-text" class="text-xs text-slate-300 leading-relaxed">
-                        衛教分析內容加載中...
-                    </p>
-                </div>
-
-                <!-- Recommended Formulations -->
-                <div class="space-y-3">
-                    <div class="flex items-center justify-between px-1">
-                        <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
-                            <svg class="w-4 h-4 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
-                            專屬關鍵營養配方推薦
-                        </h3>
-                        <span class="text-[10px] text-slate-400">精準對應阻滯點</span>
-                    </div>
-
-                    <div id="product-recommendations" class="space-y-3">
-                        <!-- Dynamic Product Cards -->
-                    </div>
-                </div>
-
-                <!-- Dual CTA Action Section -->
-                <div class="space-y-3 pt-2">
-                    <!-- Primary CTA: Official Store + Coupon -->
-                    <a id="primary-cta" href="https://example.com/shop" target="_blank" onclick="handleCTAClick('Primary_Shop')" class="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-brand-500 to-emerald-600 text-slate-950 font-extrabold text-sm shadow-lg shadow-brand-500/20 hover:opacity-95 transition-all flex items-center justify-between group">
-                        <div class="flex items-center space-x-2">
-                            <svg class="w-5 h-5 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                            <span>領取專屬折扣，前往官網查看解法</span>
-                        </div>
-                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-
-                    <!-- Secondary CTA: LINE 1v1 Consultation -->
-                    <a id="secondary-cta" href="https://line.me/R/ti/p/@example" target="_blank" onclick="handleCTAClick('Secondary_LINE')" class="w-full py-3.5 px-5 rounded-xl bg-slate-800 hover:bg-slate-700/80 text-emerald-400 font-bold text-sm border border-emerald-500/30 transition-all flex items-center justify-between group">
-                        <div class="flex items-center space-x-2">
-                            <svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 5.82 2 10.53c0 4.23 3.65 7.78 8.58 8.42.33.07.79.22.9.51.11.29.07.75.03 1.05-.07.45-.3 1.74-.34 2.12-.06.58.27.7.57.48 2.27-1.67 6.13-4.5 8.38-7.7C21.46 13.06 22 11.85 22 10.53 22 5.82 17.52 2 12 2z"/></svg>
-                            <span>加 LINE 領取 1v1 營養師客製報告</span>
-                        </div>
-                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-                    </a>
-                </div>
-
-                <!-- Retake Quiz Button -->
-                <div class="text-center pt-2">
-                    <button onclick="resetQuiz()" class="text-xs text-slate-500 hover:text-slate-300 underline underline-offset-4 transition-colors">
-                        重新進行 90 秒測試
-                    </button>
-                </div>
-
-            </section>
-
+            </div>
+            <button onclick="startQuiz()" class="w-full py-4 px-6 bg-earth-500 hover:bg-earth-600 text-white font-medium rounded-2xl shadow-lg shadow-earth-500/20 transition-all-custom flex items-center justify-center gap-2 text-base">
+                開始 90 秒自我探索 <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
         </div>
+
+        <!-- STEP 1-5: Quiz Question Screen -->
+        <div id="step-quiz" class="hidden bg-[#FFFDF9] rounded-3xl p-6 md:p-8 card-shadow border border-cream-200 transition-all-custom">
+            <!-- Progress Bar -->
+            <div class="mb-6">
+                <div class="flex justify-between text-xs text-charcoal-800 opacity-60 mb-2 font-medium">
+                    <span id="question-number">問題 1 / 5</span>
+                    <span id="progress-percent">20%</span>
+                </div>
+                <div class="w-full bg-cream-200 rounded-full h-1.5 overflow-hidden">
+                    <div id="progress-bar" class="bg-earth-500 h-1.5 rounded-full transition-all duration-300" style="width: 20%"></div>
+                </div>
+            </div>
+
+            <!-- Question Title -->
+            <h2 id="question-text" class="text-lg font-semibold text-charcoal-800 serif-title mb-5 leading-snug">
+                載入問題中...
+            </h2>
+
+            <!-- Options Container -->
+            <div id="options-container" class="space-y-3 mb-6">
+                <!-- Dynamic options inserted via JS -->
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="flex justify-between items-center pt-2">
+                <button id="prev-btn" onclick="prevQuestion()" class="text-xs font-medium text-charcoal-800 opacity-50 hover:opacity-100 transition-opacity flex items-center gap-1.5 py-2 px-3">
+                    <i class="fa-solid fa-chevron-left text-[10px]"></i> 返回上一題
+                </button>
+                <span class="text-[11px] text-charcoal-800 opacity-40 font-light">點選選項自動前往下一題</span>
+            </div>
+        </div>
+
+        <!-- STEP 6: Analyzing Screen -->
+        <div id="step-analyzing" class="hidden bg-[#FFFDF9] rounded-3xl p-8 card-shadow border border-cream-200 text-center py-12 transition-all-custom">
+            <div class="relative w-20 h-20 mx-auto mb-6 flex items-center justify-center">
+                <div class="absolute inset-0 border-4 border-cream-200 border-t-earth-500 rounded-full animate-spin"></div>
+                <i class="fa-solid fa-seedling text-sage-500 text-xl"></i>
+            </div>
+            <h2 class="text-lg font-semibold text-charcoal-800 serif-title mb-2">正在梳理你的身心數據脈絡...</h2>
+            <p class="text-xs text-charcoal-800 opacity-60 font-light">比對飲食規律、睡眠修復與代謝平衡指標中</p>
+        </div>
+
+        <!-- STEP 7: Result Screen -->
+        <div id="step-result" class="hidden space-y-4 transition-all-custom">
+            <!-- Profile Result Card -->
+            <div class="bg-[#FFFDF9] rounded-3xl p-6 md:p-8 card-shadow border border-cream-200">
+                <div class="inline-block px-3 py-1 bg-cream-200 text-earth-700 rounded-full text-xs font-medium mb-3">
+                    診斷結果
+                </div>
+                <h2 id="result-title" class="text-2xl font-bold text-charcoal-800 serif-title mb-3">
+                    -- 代謝阻滯型態
+                </h2>
+                <div class="p-4 bg-cream-100 rounded-2xl mb-4 text-xs leading-relaxed text-charcoal-800 opacity-90 border-l-2 border-earth-500">
+                    <span class="font-semibold block mb-1 text-charcoal-900">核心脈絡分析：</span>
+                    <p id="result-insight">--</p>
+                </div>
+
+                <!-- Detail Breakdown -->
+                <div class="space-y-3 mb-5">
+                    <h3 class="text-xs font-bold tracking-wider text-charcoal-800 opacity-50 uppercase">建議養護重點</h3>
+                    <ul id="result-[#FFFDF9]" class="space-y-2 text-xs text-charcoal-800 opacity-80">
+                        <!-- Dynamic tips -->
+                    </ul>
+                </div>
+
+                <!-- Product Solution -->
+                <div class="p-4 bg-sage-500/10 rounded-2xl border border-sage-500/20 mb-2">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        <i class="fa-solid fa-prescription-bottle-medical text-sage-600 text-sm"></i>
+                        <span class="text-xs font-bold text-sage-600">營養師對應解法建議</span>
+                    </div>
+                    <p id="result-product-desc" class="text-xs text-charcoal-800 opacity-90 leading-relaxed">--</p>
+                </div>
+            </div>
+
+            <!-- Dual CTA Card -->
+            <div class="bg-[#FFFDF9] rounded-3xl p-6 card-shadow border border-cream-200 space-y-3 text-center">
+                <h3 class="text-sm font-semibold text-charcoal-800 serif-title">啟動你的專屬調理計畫</h3>
+                <p class="text-xs text-charcoal-800 opacity-60 font-light">選擇最適合你的下一步行動方式</p>
+
+                <!-- Primary CTA: Direct Product -->
+                <a id="cta-shop-btn" href="#" target="_blank" onclick="trackAnalyticsEvent('Click_Shop')" class="block w-full py-3.5 px-5 bg-earth-500 hover:bg-earth-600 text-white font-medium rounded-2xl shadow-md transition-all-custom text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-bag-shopping"></i> 查看專屬對應保健配方 (領取折價券)
+                </a>
+
+                <!-- Secondary CTA: LINE Private Consultation -->
+                <a id="cta-line-btn" href="#" target="_blank" onclick="trackAnalyticsEvent('Click_LINE')" class="block w-full py-3.5 px-5 bg-sage-500 hover:bg-sage-600 text-white font-medium rounded-2xl shadow-md transition-all-custom text-xs flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-line text-sm"></i> 加入 LINE 領取「1v1 營養師分析報告」
+                </a>
+            </div>
+
+            <!-- Retake Quiz Button -->
+            <div class="text-center pt-2">
+                <button onclick="restartQuiz()" class="text-xs text-charcoal-800 opacity-40 hover:opacity-100 transition-opacity underline">
+                    重新進行測驗
+                </button>
+            </div>
+        </div>
+
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 text-center border-t border-slate-900 text-[11px] text-slate-600">
-        <p>© 2026 Metabolic Health Lab. 本測驗僅供衛教與飲食參考。</p>
+    <footer class="w-full max-w-md mx-auto text-center py-4 text-[11px] text-charcoal-800 opacity-40 font-light">
+        © Deserved Nutrition LTD. 保健品質佳認證與科學對策
     </footer>
 
-    <!-- App Logic Script -->
+    <!-- Logic & Script -->
     <script>
-        // 1. QUESTION BANK DATA (5 Core Questions)
-        const quizQuestions = [
+        // Quiz Questions Data
+        const questions = [
             {
-                id: 1,
-                category: "Q1. 餐後體感與飲食偏好",
-                title: "你在吃完正餐（尤其是澱粉/甜食）後的反應通常是？",
+                text: "Q1. 在日常用餐後，你最常出現的身體感受是？",
                 options: [
-                    { label: "容易昏昏欲睡，且不到 3 小時又想找零食或手搖飲", scores: { carb_fat: 3, stress: 1 } },
-                    { label: "吃稍微油膩就感到胃脹沉重、消化速度極慢", scores: { gut: 3, carb_fat: 1 } },
-                    { label: "食欲不穩定，壓力大時會特別想暴飲暴食", scores: { stress: 3, carb_fat: 1 } },
-                    { label: "飲食還算規律，但餐後常覺得體能沒有補給到的無力感", scores: { circulation: 3, gut: 1 } }
+                    { text: "吃完澱粉/甜食後容易昏睡，不到 3 小時又想找東西吃", type: "A" },
+                    { text: "吃較油膩餐點後容易腹脹、排便不順、臉部出油感明顯", type: "A" },
+                    { text: "進食時間不固定，午後經常覺得肚子脹氣、下腹沉重", type: "C" },
+                    { text: "食慾不穩定，壓力大時會報復性進食或食慾全無", type: "B" }
                 ]
             },
             {
-                id: 2,
-                category: "Q2. 體型與脂肪/水分囤積部位",
-                title: "你覺得自己最容易囤積贅肉或不適感的部位是？",
+                text: "Q2. 關於體態與體脂肪，你最困擾的囤積位置在？",
                 options: [
-                    { label: "腹部腰圍（小腹特別明顯突出，軟軟的一圈）", scores: { carb_fat: 3, stress: 1 } },
-                    { label: "全身性體脂偏高、肩頸常年緊繃，伴隨腰腹鬆軟", scores: { stress: 3, carb_fat: 1 } },
-                    { label: "下腹部經常悶脹，體態常因脹氣看起來忽大忽小", scores: { gut: 3, circulation: 1 } },
-                    { label: "下半身/雙腿容易發脹沉重，傍晚鞋子明顯變緊", scores: { circulation: 3, gut: 1 } }
+                    { text: "腹部腰圍與肚肉顯著（腰圍較難維持）", type: "A" },
+                    { text: "下半身容易沉重、傍晚腳步緊繃", type: "D" },
+                    { text: "全身性體脂較高，運動不易看到線條變化", type: "C" },
+                    { text: "肩頸長期緊繃，腰腹脂肪偏向鬆軟且伴隨倦怠", type: "B" }
                 ]
             },
             {
-                id: 3,
-                category: "Q3. 睡眠品質與日間精神",
-                title: "你目前的日常生活狀態與睡眠狀況較符合哪項？",
+                text: "Q3. 觀察目前的睡眠品質與白天的精神狀態：",
                 options: [
-                    { label: "午後 2-4 點精神容易斷崖式下降，非得靠咖啡或糖分硬撐", scores: { carb_fat: 3, stress: 1 } },
-                    { label: "入睡困難、多夢易醒，即使睡滿 8 小時起床依然覺得累", scores: { stress: 3, circulation: 1 } },
-                    { label: "腸胃不適影響睡眠品質，早上起床口乾口苦、氣色沉暗", scores: { gut: 3, stress: 1 } },
-                    { label: "肌肉長時間緊繃痠痛，睡醒後身體僵硬、恢復極慢", scores: { circulation: 3, stress: 1 } }
+                    { text: "早上醒來依然昏沉，午後 2-4 點精神斷崖式下降", type: "B" },
+                    { text: "入睡需要很久，或半夜易醒、越到深夜越興奮", type: "B" },
+                    { text: "雖然睡滿時間，但總覺得身體很重、氣色不佳", type: "D" },
+                    { text: "精神尚可，但工作或運動後的疲勞恢復期非常長", type: "D" }
                 ]
             },
             {
-                id: 4,
-                category: "Q4. 運動泵感與體能恢復",
-                title: "當你進行運動或高強度活動時，身體的體感偏向？",
+                text: "Q4. 你目前的日常活動與運動習慣是？",
                 options: [
-                    { label: "久坐少動，稍微活動就極度喘與疲倦，難以維持規律", scores: { carb_fat: 2, circulation: 2 } },
-                    { label: "有運動習慣但體脂極難下降，運動完反而更容易失眠疲憊", scores: { stress: 3, carb_fat: 1 } },
-                    { label: "運動時腸胃容易感到悶脹或不適，影響訓練節奏", scores: { gut: 3, circulation: 1 } },
-                    { label: "運動時充血泵感 (Pump) 不佳，爆發力差且肌耐力掉得快", scores: { circulation: 3, stress: 1 } }
+                    { text: "幾乎不運動，日常以長時間久坐為主", type: "C" },
+                    { text: "有運動習慣，但泵感/充血感不佳且容易提早力竭", type: "D" },
+                    { text: "規律運動且飲食控制，但體重與體脂卡在瓶頸期", type: "A" },
+                    { text: "想運動但總是缺乏體力與動力，生活心力交瘁", type: "B" }
                 ]
             },
             {
-                id: 5,
-                category: "Q5. 目前最想優先改善的健康目標",
-                title: "如果只能先解決一個痛點，你最希望突破的是？",
+                text: "Q5. 如果能改善一個狀況，你最希望優化的是？",
                 options: [
-                    { label: "阻斷大餐負擔、促進代謝，突破體態卡關期", scores: { carb_fat: 3 } },
-                    { label: "釋放累積壓力、提升深層睡眠品質，恢復白天專注力", scores: { stress: 3 } },
-                    { label: "改善消化道機能、擺脫腹脹悶感，維持排便順暢", scores: { gut: 3 } },
-                    { label: "提升周邊循環與運動充血感，告別下肢沉重並加速恢復", scores: { circulation: 3 } }
+                    { text: "減少大餐與澱粉油脂負擔，順暢維持體態", type: "A" },
+                    { text: "釋放累積的慢性壓力、獲得深層高品質睡眠", type: "B" },
+                    { text: "維持消化道機能，排便順暢不卡關", type: "C" },
+                    { text: "提升體能與運動表現，充實活力感受", type: "D" }
                 ]
             }
         ];
 
-        // 2. METABOLIC PROFILES DATA MATRIX
-        const metabolicProfiles = {
-            carb_fat: {
-                id: "carb_fat",
-                title: "【醣類與脂質代謝滯留型】",
-                riskText: "中高度胰島素敏感度波動",
-                analysis: "你的體質對於精緻碳水化合物與油脂的運轉效率下降。餐後血糖大幅波動易引發胰島素過度分泌，促使過剩熱量優先轉化為腰腹脂肪囤積，造成「餐後易昏睡、越餓越想吃甜食」的代謝惡性循環。",
-                products: [
-                    {
-                        name: "MetaBlock 閃電油切膠囊",
-                        tag: "關鍵阻斷",
-                        desc: "含專利藤黃果與苦瓜胜肽，穩定餐後波動，減少醣類轉化為脂肪。",
-                        badge: "熱銷 Top 1"
-                    },
-                    {
-                        name: "FiberZyme 纖維酵素粉",
-                        tag: "油質分解",
-                        desc: "80+ 專利蔬果酵素搭配水溶性膳食纖維，加速大餐排空與代謝。",
-                        badge: "順暢必備"
-                    }
-                ]
+        // Result Profiles Mapping
+        const profiles = {
+            A: {
+                title: "醣類與脂質代謝滯留型",
+                insight: "日常餐後血糖波動較劇烈，導致胰島素敏銳度下降，熱量傾向優先囤積於腹部。常伴隨食後昏睡與頻繁想吃宵夜的飢餓訊號。",
+                tips: [
+                    "• 調整進食順序：蔬菜/蛋白質 ➔ 澱粉餐點",
+                    "• 避免單獨攝取精緻糖，降低餐後波動",
+                    "• 補充專利阻斷成分，減少澱粉與油脂吸附負擔"
+                ],
+                product: "建議搭配【MetaBlock 閃電油切】或【FiberZyme 纖維酵素粉】，有助於餐後平穩與減少熱量負擔。",
+                shopUrl: "https://www.deservednutrition.com/", // 請替換為你的商品網址
+                lineUrl: "https://line.me/" // 請替換為你的 LINE 網址
             },
-            stress: {
-                id: "stress",
-                title: "【壓力皮質醇與高壓型】",
-                riskText: "皮質醇節律失衡風險",
-                analysis: "長期處於慢性壓力、焦慮或高壓環境下，體內的皮質醇 (Cortisol) 濃度持續偏高。這不僅會抑制基礎代謝率，還會發送訊號將脂肪儲存在內臟與腹部，同時干擾夜間深層睡眠，導致慢性疲勞。",
-                products: [
-                    {
-                        name: "StressDown 好舒壓膠囊",
-                        tag: "皮質醇調節",
-                        desc: "高純度南非醉茄 (KSM-66) + GABA，安撫交感神經，幫助深層入睡。",
-                        badge: "放鬆首選"
-                    },
-                    {
-                        name: "紅景天全方位 EX",
-                        tag: "細胞抗壓",
-                        desc: "高濃縮紅景天萃取搭配活性 B 群，打擊日間精神斷崖與慢性疲勞。",
-                        badge: "精力補給"
-                    }
-                ]
+            B: {
+                title: "壓力皮質醇阻滯型",
+                insight: "長期處於高壓狀態使皮質醇（壓力荷爾蒙）持續偏高，這會抑制基礎代謝速率，同時將脂肪鎖定在腰腹位置，並干擾睡眠修復機制。",
+                tips: [
+                    "• 睡前 1 小時遠離藍光與工作訊息，讓副交感神經主導",
+                    "• 每日固定進行 10 分鐘深呼吸或伸展",
+                    "• 補充幫助調節皮質醇與壓力回應的植物萃取"
+                ],
+                product: "建議搭配【StressDown 好舒壓】或【全方位紅景天 EX】，調節壓力荷爾蒙與提升高壓適應力。",
+                shopUrl: "https://www.deservednutrition.com/",
+                lineUrl: "https://line.me/"
             },
-            gut: {
-                id: "gut",
-                title: "【腸道消化與消化道阻滯型】",
-                riskText: "消化道微生態失衡",
-                analysis: "你的消化道菌群失衡且酵素活性較低，導致食物殘渣在腸道停留時間過長並異常發酵。這不僅會引起頻繁的肚子悶脹與排便不順，更會引發全身性的微發炎反應，削弱整體基礎代謝。",
-                products: [
-                    {
-                        name: "VitaSpore 多酚益生菌",
-                        tag: "微生態重塑",
-                        desc: "專利耐酸芽孢乳酸菌 + 植物多酚，改變菌叢生態，擺脫卡關悶脹。",
-                        badge: "順暢冠軍"
-                    },
-                    {
-                        name: "FiberZyme 纖維酵素粉",
-                        tag: "食物分解",
-                        desc: "複合消化酵素有效拆解蛋白質與澱粉，減輕消化道負擔。",
-                        badge: "消化對策"
-                    }
-                ]
+            C: {
+                title: "腸道消化與消化道阻滯型",
+                insight: "消化酵素分泌不足或菌群失去平衡，導致食物發酵產生氣體與下腹沉重感，營養吸收效率降低，連帶影響全身基礎代謝。",
+                tips: [
+                    "• 每口咀嚼 20 次以上，減輕胃腸物理消化負擔",
+                    "• 增加膳食纖維與多酚類食物的攝取",
+                    "• 補充活性酵素與特定益生菌株，優化消化環境"
+                ],
+                product: "建議搭配【VitaSpore 多酚益生菌】與【FiberZyme 纖維酵素粉】，重塑消化道好菌生態。",
+                shopUrl: "https://www.deservednutrition.com/",
+                lineUrl: "https://line.me/"
             },
-            circulation: {
-                id: "circulation",
-                title: "【微循環與能量耗竭型】",
-                riskText: "一氧化氮 (NO) 生成不足",
-                analysis: "你的血管內皮一氧化氮合成能力較弱，導致周邊微循環效率降低，血液與氧氣輸送至組織的速度受限。表現為運動時泵感 (Pump) 不佳、恢復緩慢，以及日常下肢容易沉重水腫。",
-                products: [
-                    {
-                        name: "NitroPump 好泵甜菜根訓前粉",
-                        tag: "一氧化氮生成",
-                        desc: "濃縮甜菜根硝酸鹽 + L-精胺酸，促進血管擴張，充沛訓練泵感與充血。",
-                        badge: "運動必備"
-                    },
-                    {
-                        name: "微循環七葉樹複合膠囊",
-                        tag: "水分順暢",
-                        desc: "專利七葉樹萃取 + 柑橘生物黃酮，促進下肢滯水循環，恢復輕盈。",
-                        badge: "久站救星"
-                    }
-                ]
+            D: {
+                title: "微循環與能量耗竭型",
+                insight: "一氧化氮生成率與微循環偏慢，導致養分與氧氣輸送效率不佳，運動時不易產生良好泵感（Pump），且運動後代謝廢物不易排除。",
+                tips: [
+                    "• 增加日常水分攝取，每公斤體重建議 35-40cc",
+                    "• 補充甜菜根等富含天然硝酸鹽的食萃原料",
+                    "• 安排適度有氧運動作為積極性恢復"
+                ],
+                product: "建議搭配【NitroPump 好泵甜菜根訓前粉】，強化一氧化氮合成與運動循環表現。",
+                shopUrl: "https://www.deservednutrition.com/",
+                lineUrl: "https://line.me/"
             }
         };
 
-        // 3. STATE MANAGEMENT
-        let currentQuestionIndex = 0;
-        let userScores = {
-            carb_fat: 0,
-            stress: 0,
-            gut: 0,
-            circulation: 0
-        };
+        // State variables
+        let currentQuestion = 0;
+        let answers = [];
 
-        // 4. APP DOM ELEMENTS
-        const startScreen = document.getElementById('start-screen');
-        const questionScreen = document.getElementById('question-screen');
-        const loadingScreen = document.getElementById('loading-screen');
-        const resultScreen = document.getElementById('result-screen');
-        const progressBarContainer = document.getElementById('progress-bar-container');
+        // DOM elements
+        const stepIntro = document.getElementById('step-intro');
+        const stepQuiz = document.getElementById('step-quiz');
+        const stepAnalyzing = document.getElementById('step-analyzing');
+        const stepResult = document.getElementById('step-result');
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const questionNumber = document.getElementById('question-number');
+        const progressPercent = document.getElementById('progress-percent');
         const progressBar = document.getElementById('progress-bar');
-        const progressText = document.getElementById('progress-text');
-        const headerBadge = document.getElementById('header-badge');
         const prevBtn = document.getElementById('prev-btn');
 
-        // 5. START QUIZ FUNCTION
+        // Functions
         function startQuiz() {
-            trackAnalyticsEvent('Quiz_Started');
-            
-            startScreen.classList.add('hidden');
-            questionScreen.classList.remove('hidden');
-            progressBarContainer.classList.remove('hidden');
-            headerBadge.classList.remove('hidden');
-
-            currentQuestionIndex = 0;
-            userScores = { carb_fat: 0, stress: 0, gut: 0, circulation: 0 };
-            
+            stepIntro.classList.add('hidden');
+            stepQuiz.classList.remove('hidden');
+            currentQuestion = 0;
+            answers = [];
             renderQuestion();
+            trackAnalyticsEvent('Quiz_Start');
         }
 
-        // 6. RENDER QUESTION
         function renderQuestion() {
-            const q = quizQuestions[currentQuestionIndex];
+            const q = questions[currentQuestion];
+            questionText.innerText = q.text;
+            questionNumber.innerText = `問題 ${currentQuestion + 1} / ${questions.length}`;
             
-            // Update progress header
-            const progressPercent = ((currentQuestionIndex + 1) / quizQuestions.length) * 100;
-            progressBar.style.width = `${progressPercent}%`;
-            progressText.innerText = `${currentQuestionIndex + 1}/${quizQuestions.length}`;
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            progressPercent.innerText = `${Math.round(progress)}%`;
+            progressBar.style.width = `${progress}%`;
 
-            // Category & Title
-            document.getElementById('question-category').innerText = q.category;
-            document.getElementById('question-title').innerText = q.title;
+            if (currentQuestion === 0) {
+                prevBtn.classList.add('invisible');
+            } else {
+                prevBtn.classList.remove('invisible');
+            }
 
-            // Options Container
-            const container = document.getElementById('options-container');
-            container.innerHTML = '';
-
-            q.options.forEach((opt, idx) => {
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
-                btn.className = "option-btn w-full text-left p-4 rounded-xl glass-card border border-slate-700/60 hover:border-brand-500/50 hover:bg-slate-800/80 transition-all flex items-start space-x-3 group";
-                btn.onclick = () => selectOption(opt.scores);
-
+                btn.className = 'w-full text-left p-4 rounded-2xl border border-cream-200 bg-cream-50 hover:bg-cream-100 hover:border-cream-300 transition-all-custom flex items-center justify-between text-xs text-charcoal-800 font-normal group mb-2';
                 btn.innerHTML = `
-                    <span class="w-6 h-6 rounded-full bg-slate-800 border border-slate-600 text-slate-300 text-xs font-bold flex items-center justify-center flex-shrink-0 group-hover:border-brand-400 group-hover:text-brand-400 transition-colors mt-0.5">
-                        ${String.fromCharCode(65 + idx)}
-                    </span>
-                    <span class="text-xs sm:text-sm text-slate-200 font-medium leading-relaxed group-hover:text-white">
-                        ${opt.label}
-                    </span>
+                    <span class="pr-2 leading-relaxed">${opt.text}</span>
+                    <i class="fa-solid fa-chevron-right text-[10px] text-charcoal-800 opacity-30 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all"></i>
                 `;
-                container.appendChild(btn);
+                btn.onclick = () => selectOption(opt.type);
+                optionsContainer.appendChild(btn);
             });
-
-            // Back button visibility
-            if (currentQuestionIndex > 0) {
-                prevBtn.classList.remove('hidden');
-            } else {
-                prevBtn.classList.add('hidden');
-            }
         }
 
-        // 7. SELECT OPTION & AUTO NEXT
-        function selectOption(scores) {
-            // Accumulate scores
-            for (let key in scores) {
-                userScores[key] += scores[key];
-            }
-
-            // Track option selection
-            trackAnalyticsEvent('Question_Answered', {
-                question_index: currentQuestionIndex + 1,
-                scores: scores
-            });
-
-            if (currentQuestionIndex < quizQuestions.length - 1) {
-                currentQuestionIndex++;
+        function selectOption(type) {
+            answers[currentQuestion] = type;
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
                 renderQuestion();
             } else {
-                calculateResult();
+                showAnalyzing();
             }
         }
 
-        // 8. PREVIOUS QUESTION
         function prevQuestion() {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
+            if (currentQuestion > 0) {
+                currentQuestion--;
                 renderQuestion();
             }
         }
 
-        // 9. CALCULATE AND SHOW LOADING THEN RESULT
-        function calculateResult() {
-            questionScreen.classList.add('hidden');
-            progressBarContainer.classList.add('hidden');
-            loadingScreen.classList.remove('hidden');
-
-            // Dynamic subtext simulation
-            const subtexts = [
-                "解析血糖震盪與代謝率...",
-                "計算皮質醇壓力指數...",
-                "評估腸道發酵與微循環對接..."
-            ];
-            let subIdx = 0;
-            const interval = setInterval(() => {
-                subIdx = (subIdx + 1) % subtexts.length;
-                document.getElementById('loading-subtext').innerText = subtexts[subIdx];
-            }, 600);
-
+        function showAnalyzing() {
+            stepQuiz.classList.add('hidden');
+            stepAnalyzing.classList.remove('hidden');
+            
             setTimeout(() => {
-                clearInterval(interval);
-                loadingScreen.classList.add('hidden');
-                resultScreen.classList.remove('hidden');
-
-                // Find highest score
-                let highestKey = "carb_fat";
-                let maxScore = -1;
-                let totalScore = 0;
-
-                for (let key in userScores) {
-                    totalScore += userScores[key];
-                    if (userScores[key] > maxScore) {
-                        maxScore = userScores[key];
-                        highestKey = key;
-                    }
-                }
-
-                // Match Rate calculation (Ranges logically between 85% to 98%)
-                const matchRate = Math.min(98, Math.max(85, Math.round((maxScore / totalScore) * 100 + 25)));
-
-                // Render Result Data
-                renderResultData(highestKey, matchRate);
-
-                // Trigger Confetti effect
-                if (typeof confetti === 'function') {
-                    confetti({
-                        particleCount: 60,
-                        spread: 70,
-                        origin: { y: 0.6 }
-                    });
-                }
-
-                // Trigger pixel/analytics event
-                trackAnalyticsEvent('Quiz_Completed', {
-                    result_type: highestKey,
-                    match_rate: matchRate
-                });
-
-            }, 2000);
+                stepAnalyzing.classList.add('hidden');
+                calculateAndShowResult();
+            }, 1800);
         }
 
-        // 10. RENDER RESULT SCREEN
-        function renderResultData(typeKey, matchRate) {
-            const profile = metabolicProfiles[typeKey];
-
-            document.getElementById('result-type-title').innerText = profile.title;
-            document.getElementById('result-match-rate').innerText = `${matchRate}%`;
-            document.getElementById('result-risk-level').innerText = profile.riskText;
-            document.getElementById('result-analysis-text').innerText = profile.analysis;
-
-            // Product Cards Insertion
-            const prodContainer = document.getElementById('product-recommendations');
-            prodContainer.innerHTML = '';
-
-            profile.products.forEach(prod => {
-                const card = document.createElement('div');
-                card.className = "glass-card rounded-xl p-4 border border-slate-700/60 flex items-start justify-between gap-3";
-                card.innerHTML = `
-                    <div class="space-y-1">
-                        <div class="flex items-center space-x-2">
-                            <span class="text-xs font-bold text-slate-100">${prod.name}</span>
-                            <span class="text-[10px] bg-brand-500/20 text-brand-400 border border-brand-500/30 px-2 py-0.5 rounded font-semibold">${prod.tag}</span>
-                        </div>
-                        <p class="text-xs text-slate-400 leading-relaxed">${prod.desc}</p>
-                    </div>
-                    <span class="text-[10px] bg-slate-800 text-slate-300 px-2 py-1 rounded font-medium flex-shrink-0">${prod.badge}</span>
-                `;
-                prodContainer.appendChild(card);
+        function calculateAndShowResult() {
+            // Count answer frequencies
+            const counts = { A: 0, B: 0, C: 0, D: 0 };
+            answers.forEach(type => {
+                if (counts[type] !== undefined) counts[type]++;
             });
-        }
 
-        // 11. CTA CLICK TRACKER
-        function handleCTAClick(ctaType) {
-            trackAnalyticsEvent('CTA_Clicked', {
-                type: ctaType
+            // Find dominant type
+            let resultType = 'A';
+            let maxCount = -1;
+            for (const key in counts) {
+                if (counts[key] > maxCount) {
+                    maxCount = counts[key];
+                    resultType = key;
+                }
+            }
+
+            const p = profiles[resultType];
+
+            document.getElementById('result-title').innerText = p.title;
+            document.getElementById('result-insight').innerText = p.insight;
+            document.getElementById('result-product-desc').innerText = p.product;
+
+            const tipsList = document.getElementById('result-[#FFFDF9]');
+            tipsList.innerHTML = '';
+            p.tips.forEach(tip => {
+                const li = document.createElement('li');
+                li.innerText = tip;
+                tipsList.appendChild(li);
             });
+
+            document.getElementById('cta-shop-btn').href = p.shopUrl;
+            document.getElementById('cta-line-btn').href = p.lineUrl;
+
+            stepResult.classList.remove('hidden');
+
+            // Trigger soft celebration confetti
+            confetti({
+                particleCount: 30,
+                spread: 50,
+                origin: { y: 0.6 },
+                colors: ['#C86D51', '#5B8266', '#E8DEC9']
+            });
+
+            trackAnalyticsEvent('Quiz_Complete', { result: p.title });
         }
 
-        // 12. RESET QUIZ
-        function resetQuiz() {
-            resultScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-            headerBadge.classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function restartQuiz() {
+            stepResult.classList.add('hidden');
+            stepIntro.classList.remove('hidden');
+        }
+
+        // Tracking helper (Meta Pixel / GA4 hooks)
+        function trackAnalyticsEvent(eventName, params = {}) {
+            console.log(`[Analytics Event]: ${eventName}`, params);
+            
+            // 解開下方註解即可整合追蹤：
+            // if (typeof fbq !== 'undefined') fbq('trackCustom', eventName, params);
+            // if (typeof gtag !== 'undefined') gtag('event', eventName, params);
         }
     </script>
 </body>
